@@ -1,0 +1,113 @@
+from sys import argv
+
+def main() -> int:
+    if not argv:
+        return 0
+    return 0
+
+"""
+Type Hierarchy
+
+Primitivies:
+    Literals are Primitivies
+    chars
+    ints
+    bools
+    floats
+
+Secondaries:
+    Containers are Secondaries:
+    that can be type locked:
+    string of chars
+    array of ints
+    vector of floats
+    bank of booleans
+    or can be type free:
+    list of anything
+    heap of anything
+    stack of anything
+    queue of anything
+    map of anything
+    etc...
+
+Terciaries:
+    User types are Terciaries:
+    interface
+    alias
+    function
+    etc...
+"""
+
+"""
+interface definition and declaration
+interface MyInterface(void) {
+    private:
+        attr: int = 0;
+    protected:
+        shared_array: array = [];
+    public:
+        constructor([...]: *) -> MyInterface {
+            self::attr = 10; // or attr = 10;
+        }
+
+        copy(other: MyInterface) -> self {
+            self::attr = other::attr;
+        }
+
+        assign(other: MyInterface) -> self {
+            if (other == self)
+                return self;
+            self::attr = other::attr;
+        }
+
+        destructor(void) -> void {
+            // destroys itself;
+        }
+
+    // Methods:
+        // getters:
+        get attr(void) -> int {
+            return (self::attr);
+        }
+
+        // setters:
+        set attr(attr: int) -> self {
+            if (not attr) { // or !attr or attr == 0
+                return self;
+            }
+            self::attr = attr;
+        }
+
+        doSomething(void) -> void;
+        /*
+            if a method is declared but not defined in the class
+            it can be defined with the scope resolution operator
+        */
+        notDefined(void) -> void;
+        /*
+            if a method is not defined but is declared, it gets
+            shadowed. (i.e. it gets commented out).
+            so it basically doesnt exits;   
+        */
+        shouldBeDefined(void) -> void;
+}
+
+Interface method definition:
+    MyInterface::doSomething(void) -> void {
+        println("Something is done");
+        self::shared_array.push(10);
+        return 0;
+    }
+    MyInterface::shouldBeDefined(void) -> void;
+    /*
+        if a declaration is resolved with the scope resolution
+        but no definition is made, it should raise an error
+    */
+    MyInterface::notDeclaredMethod(void) -> void;
+    /*
+        if a method is not declared in the class but defined
+        with the scope resolution, it becomes a static method
+        that only exists in the translation unit and no where else
+        and can only be acessed with the scope resolution;
+    */
+"""
