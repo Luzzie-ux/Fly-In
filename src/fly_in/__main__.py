@@ -34,8 +34,15 @@ Terciaries:
     User types are Terciaries:
     interface
     alias
-    function
     etc...
+
+Functions:
+    can be comprised of Arguments, Return Value and its Name
+    like python and its Callable type;
+    so a function can be represented as Function<arg: [...], return: [...]>;
+    like a map basically;
+    the argument type shouldnt really matter unless comparing againts another
+    function name; if againts its values, only the return type is checked;
 """
 
 """
