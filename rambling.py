@@ -3,10 +3,11 @@ Type Hierarchy
 
 Primitivies:
     Literals are Primitivies
-    chars
-    ints
-    bools
-    floats
+    char
+    int
+    bool
+    float
+    "string" literals are also primitivies
 
 Secondaries:
     Containers are Secondaries:
@@ -39,7 +40,7 @@ Functions:
 """
 
 """
-interface definition and declaration
+//interface definition and declaration:
 interface MyInterface(void) {
     private:
         attr: int = 0;
@@ -90,26 +91,29 @@ interface MyInterface(void) {
             so it basically doesnt exits;   
         */
         shouldBeDefined(void) -> void;
+        static ClassMethod(void) -> void;
+        // static methods need to be defined or else they will raise an error.
 }
 """
 
 """
-Interface methods definition:
-    MyInterface::doSomething(void) -> void {
-        println("Something is done");
-        self::shared_array.push(10);
-        return 0;
-    }
-    MyInterface::shouldBeDefined(void) -> void;
-    /*
-        if a declaration is resolved with the scope resolution
-        but no definition is made, it should raise an error
-    */
-    MyInterface::notDeclaredMethod(void) -> void;
-    /*
-        if a method is not declared in the class but defined
-        with the scope resolution, it becomes a static method
-        that only exists in the translation unit and no where else
-        and can only be acessed with the scope resolution;
-    */
+//Interface methods definition:
+MyInterface::doSomething(void) -> void {
+    println("Something is done");
+    self::shared_array.push(10);
+    return 0;
+}
+
+MyInterface::shouldBeDefined(void) -> void;
+/*
+    if a declaration is resolved with the scope resolution
+    but no definition is made, it should raise an error
+*/
+MyInterface::notDeclaredMethod(void) -> void;
+/*
+    if a method is not declared in the class but defined
+    with the scope resolution, it becomes a static method
+    that only exists in the translation unit and no where else
+    and can only be acessed with the scope resolution;
+*/
 """
