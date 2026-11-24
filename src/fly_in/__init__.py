@@ -1,2 +1,3 @@
-def main() -> None:
-    print("Hello from fly-in!")
+from .parser import Parser
+
+__all__ = ["Parser"]

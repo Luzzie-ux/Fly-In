@@ -1,6 +1,8 @@
-from sys import argv
+from sys import argv, exit
+from fly_in import Parser
 
-def main() -> int:
-    if not argv:
-        return 0
-    return 0
+input = Parser(argv)
+if input < 2:
+    print("ERROR")
+    exit(1)
+input()
