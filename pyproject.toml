@@ -1,15 +1,14 @@
 [project]
 name = "fly-in"
 version = "0.1.0"
-description = "Add your description here"
+description = "Fly-In the drone path tester"
 readme = "README.md"
 authors = [
-    { name = "Luzzie", email = "estelarodrigoluz@gmail.com" }
+    { name = "rodrpere", email = "estelarodrigoluz@gmail.com" }
 ]
-requires-python = ">=3.10.0"
+requires-python = ">=3.10"
 dependencies = [
-    "flake8>=7.4.1",
-    "mypy>=2.4.1",
+    "pygame>=2.6.1",
 ]
 
 [project.scripts]
@@ -18,3 +17,9 @@ fly-in = "fly_in:main"
 [build-system]
 requires = ["uv_build>=0.13.6,<0.14.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "flake8>=7.4.1",
+    "mypy>=2.4.1",
+]
