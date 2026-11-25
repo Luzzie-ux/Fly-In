@@ -1,8 +1,10 @@
 from sys import argv, exit
-from fly_in import Parser
+from fly_in import Parser, ParserError
 
-input = Parser(argv)
-if input < 2:
-    print("ERROR")
+try:
+    Parser.validate(argv)
+    for tokens in Parser.getTokens():
+        print(tokens)
+except ParserError:
+    print("Ending Program Fly-In")
     exit(1)
-input()
