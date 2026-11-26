@@ -1,5 +1,5 @@
 """
-Type Hierarchy
+// Type Hierarchy
 
 Primitivies:
     Literals are Primitivies
@@ -26,7 +26,9 @@ Secondaries:
 
 Terciaries:
     User types are Terciaries:
+    struct
     interface
+    class
     alias
     etc...
 
@@ -40,8 +42,16 @@ Functions:
 """
 
 """
-//interface definition and declaration:
-interface MyInterface(void) {
+File Level Keywords:
+    Module || export
+    Types
+    Script
+    Main || Fn main() -> int {}
+"""
+
+"""
+// class definition and declaration:
+class MyClass(void) {
     private:
         attr: int = 0;
     protected:
@@ -97,8 +107,8 @@ interface MyInterface(void) {
 """
 
 """
-//Interface methods definition:
-MyInterface::doSomething(void) -> void {
+// class methods definition:
+Myclass::doSomething(void) -> void {
     println("Something is done");
     self::shared_array.push(10);
     return 0;

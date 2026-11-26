@@ -1,8 +1,8 @@
 # Parser and Config class
 from string import whitespace
-from sys import stderr, argv
+from collections.abc import Iterator, Generator
 from os import stat
-from .symbols import (Hub, Connection, Metadata, Tokens)
+from .symbols import (Hub, Connection, Tokens, WhiteSpaces, MapSymbols)
 
 class Config:
     mapname: str
@@ -14,72 +14,78 @@ class Config:
 
     def __init__(self) -> None: ...
 
-class ParserError(Exception): ...
+class ParserError(Exception):
+    def __init__(self, msg: str | None) -> None:
+        if not msg:
+            msg = "ParserError: Unknown Error"
+        super().__init__(msg)
 
 class Parser:
     # properties:
-    __tokens: list[tuple[int, list[str]]]
-    __config: Config
-    __filenames: list[str]
+    __files: list[dict[int, list[str]]] = []
+    __config: Config = Config()
 
     # constructors
     def __new__(cls) -> None:
-        cls.__tokens = []
-        cls.__config = Config()
-        cls.__filenames = []
-    
+       raise TypeError("Parser Class cannot be constructed")
+
     @classmethod
-    def validate(cls, args: list[str] = argv) -> None:
+    def getConfig(cls) -> Config:
+        return cls.__config
+
+    @classmethod
+    def getFile(cls) -> Generator[dict[int, list[str]]]:
+        yield from cls.__files
+
+    @classmethod
+    def validate(cls, args: list[str]) -> None:
         def check(args: list[str]) -> None:
             size = len(args)
             try:
                 if size < 2:
                     msg = f"Fly-In requires at least 2 arguments: got {size}"
                     raise ValueError(msg)
-            except ValueError as e:
-                print(str(e), file=stderr)
-                raise ParserError
-        check(args)
-        for i, path in enumerate(args[1: ]):
-            try:
-                if not path.strip(whitespace):
-                    raise ValueError(f"Empty Argument Nº: {i}")
-                if not stat(path).st_size:
-                    raise ValueError(f"Empty File: {path}")
-                cls.__filenames.append(path)
-                cls.__lexer(path)
-            except (FileNotFoundError, PermissionError,
-                    IsADirectoryError, OSError) as ioErr:
-                print(f"{ioErr}", file=stderr)
-                raise ParserError
             except ValueError as valErr:
-                print(f"[Error]: {valErr}", file=stderr)
-                raise ParserError
+                raise ParserError(str(valErr)) from valErr
+
+        check(args)
+        for path in args[1: ]:
+            try:
+                if not path.strip(whitespace) or not stat(path).st_size:
+                    raise ValueError(f"Invalid Argument, got: {path}")
+
+                cls.__lexer(path)
+            except (FileNotFoundError, OSError, ValueError) as perr:
+                raise ParserError(str(perr)) from perr
 
     @classmethod
     def __lexer(cls, path: str) -> None:
-        def isIgnorable(s: str) -> bool:
-            return s in (Tokens['space'], Tokens['endl'],
-                         Tokens['tab'], Tokens['comment'])
-        name: str = ''
+        d: dict[int, list[str]] = {}
         with open(path) as file:
-            name = file.name
+            d[-1] = [file.name]
             for index, line in enumerate(file.readlines()):
-                if isIgnorable(line[0]):
+                if line[0] in WhiteSpaces:
                     continue
-                cls.__tokens.append((index, line.split()))
-            cls.__tokens.append((index+1, [Tokens['terminator']]))
-        tokens = cls.__tokens
-        for (_, ts) in tokens:
-            if len(ts) == 1:
-                raise ValueError(f'Empty File: {name}')
+                d[index] = line.split(' ')
+            d[index+1] = [Tokens['terminator']]
+
+        contents = {
+            k:v for k,v in d.items()
+            if k != -1 and v != [Tokens['terminator']]
+        }
+
+        if not contents:
+            msg = f"Empty file {d[-1][0]}"
+            raise ValueError(msg)
+        
+        for k, v in contents.items():
+            if v[0] not in MapSymbols:
+                msg = f"Invalid Token found in line {k}, got: {v[0]}"
+                raise ValueError(msg)
+
+        cls.__files.append(d)
 
     @classmethod
-    def __syntaxing(cls):
-        ...
+    def __syntaxer(cls) -> None: ...
     @classmethod
-    def __parsing(cls): ...
-    @classmethod
-    def getTokens(cls) -> list[tuple[int, list[str]]]: return cls.__tokens
-    @classmethod
-    def getConfig(cls) -> Config: return cls.__config
+    def __parser(cls) -> None: ...

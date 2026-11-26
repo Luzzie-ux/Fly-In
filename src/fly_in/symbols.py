@@ -12,9 +12,24 @@ Tokens: dict[str, str] = {
         'endl': '\n',
         'tab':'\t',
         'drones': 'nb_drones:',
-        'start': 'start_hub',
+        'start': 'start_hub:',
         'hub': 'hub:',
-        'end': 'end_hub',
-        'connection': 'connection',
+        'end': 'end_hub:',
+        'connection': 'connection:',
         'terminator': '\0'
     }
+
+WhiteSpaces: tuple[str,...] = (
+        Tokens['space'],
+        Tokens['tab'],
+        Tokens['endl'],
+        Tokens['comment']
+    )
+
+MapSymbols: tuple[str,...] = (
+        Tokens['drones'],
+        Tokens['start'],
+        Tokens['hub'],
+        Tokens['end'],
+            Tokens['connection']
+    )

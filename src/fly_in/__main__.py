@@ -1,10 +1,9 @@
-from sys import argv, exit
+from sys import argv, exit, stderr
 from fly_in import Parser, ParserError
 
 try:
     Parser.validate(argv)
-    for tokens in Parser.getTokens():
-        print(tokens)
-except ParserError:
-    print("Ending Program Fly-In")
+except ParserError as e:
+    print(str(e), file=stderr)
+    print("[Ending Fly-In Simulation]")
     exit(1)
