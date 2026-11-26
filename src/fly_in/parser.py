@@ -1,6 +1,6 @@
 # Parser and Config class
 from string import whitespace
-from collections.abc import Iterator, Generator
+from collections.abc import Generator
 from os import stat
 from .symbols import (Hub, Connection, Tokens, WhiteSpaces, MapSymbols)
 
@@ -36,6 +36,15 @@ class Parser:
     @classmethod
     def getFile(cls) -> Generator[dict[int, list[str]]]:
         yield from cls.__files
+
+    @classmethod
+    def logInput(cls) -> None:
+        for file in cls.getFile():
+            print(f"\n=== {file[-1][0]}")
+            for k, v in file.items():
+                if k != -1 and v[0] != Tokens['terminator']:
+                    print(f"{k}: {v}")
+        print("="*50)
 
     @classmethod
     def validate(cls, args: list[str]) -> None:
