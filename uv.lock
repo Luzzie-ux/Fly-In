@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -107,6 +107,19 @@ wheels = [
 ]
 
 [[package]]
+name = "flake8-pyproject"
+version = "1.2.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flake8", version = "7.4.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "flake8", version = "7.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/85/6a/cdee9ff7f2b7c6ddc219fd95b7c70c0a3d9f0367a506e9793eedfc72e337/flake8_pyproject-1.2.4-py3-none-any.whl", hash = "sha256:ea34c057f9a9329c76d98723bb2bb498cc6ba8ff9872c4d19932d48c91249a77", size = 5694, upload-time = "2025-11-28T21:40:01.309Z" },
+]
+
+[[package]]
 name = "fly-in"
 version = "0.1.0"
 source = { editable = "." }
@@ -118,6 +131,7 @@ dependencies = [
 dev = [
     { name = "flake8", version = "7.4.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "flake8", version = "7.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "flake8-pyproject" },
     { name = "mypy" },
 ]
 
@@ -127,6 +141,7 @@ requires-dist = [{ name = "pygame", specifier = ">=2.6.1" }]
 [package.metadata.requires-dev]
 dev = [
     { name = "flake8", specifier = ">=7.4.1" },
+    { name = "flake8-pyproject", specifier = ">=1.2.4" },
     { name = "mypy", specifier = ">=2.4.1" },
 ]
 

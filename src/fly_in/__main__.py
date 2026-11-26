@@ -1,10 +1,11 @@
-from sys import argv, exit, stderr
+import sys
+
 from fly_in import Parser, ParserError
 
 try:
-    Parser.validate(argv)
-    Parser.logInput()
+    Parser.validate(sys.argv)
+    Parser.log()
 except ParserError as e:
-    print(str(e), file=stderr)
+    print(str(e), file=sys.stderr)
     print("[Ending Fly-In Simulation]")
-    exit(1)
+    sys.exit(1)

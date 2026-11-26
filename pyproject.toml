@@ -21,5 +21,83 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "flake8>=7.4.1",
+    "flake8-pyproject>=1.2.4",
     "mypy>=2.4.1",
 ]
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+strict = true
+exclude = [
+    ".venv/",
+    ".git/",
+    "build/",
+    "dist/",
+    "__pycache__/",
+    ".ruff_cache"
+]
+
+[tool.flake8]
+max-line-length = 79
+extend-exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    ".mypy_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+]
+count = true
+statistics = true
+show-source = true
+
+[tool.ruff]
+indent-width = 4
+line-length = 79
+respect-gitignore = true
+extend-exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    ".mypy_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+]
+show-fixes = true
+output-format = "grouped"
+
+[tool.ruff.lint]
+preview = true
+select=["ALL"]
+extend-select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "B",
+    "C90",
+    "C4",
+]
+
+ignore = [
+    "T20",
+    "RUF100",
+    "RUF201",
+    "D",
+    "DOC",
+    "CPY",
+    "COM812",
+]
+
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10

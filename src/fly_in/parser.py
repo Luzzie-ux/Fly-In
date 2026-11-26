@@ -1,9 +1,14 @@
 # Parser and Config class
-from string import whitespace
 from collections.abc import Generator
-from os import stat
-from .symbols import (Hub, Connection, Tokens, WhiteSpaces, MapSymbols)
+from dataclasses import dataclass
+from pathlib import Path
+from string import whitespace
+from typing import ClassVar
 
+from .symbols import Connection, Hub, MapSymbols, Tokens, WhiteSpaces
+
+
+@dataclass
 class Config:
     mapname: str
     nb_drones: int
@@ -12,7 +17,6 @@ class Config:
     connections: list[Connection]
     end_hub: Hub
 
-    def __init__(self) -> None: ...
 
 class ParserError(Exception):
     def __init__(self, msg: str | None) -> None:
@@ -20,73 +24,55 @@ class ParserError(Exception):
             msg = "ParserError: Unknown Error"
         super().__init__(msg)
 
+
 class Parser:
     # properties:
-    __files: list[dict[int, list[str]]] = []
-    __config: Config = Config()
+    __files: ClassVar[list[dict[int, list[str]]]] = []
+    __maps: ClassVar[list[Config]] = []
 
-    # constructors
-    def __new__(cls) -> None:
-       raise TypeError("Parser Class cannot be constructed")
-
-    @classmethod
-    def getConfig(cls) -> Config:
-        return cls.__config
-
-    @classmethod
-    def getFile(cls) -> Generator[dict[int, list[str]]]:
-        yield from cls.__files
-
-    @classmethod
-    def logInput(cls) -> None:
-        for file in cls.getFile():
-            print(f"\n=== {file[-1][0]}")
-            for k, v in file.items():
-                if k != -1 and v[0] != Tokens['terminator']:
-                    print(f"{k}: {v}")
-        print("="*50)
+    @staticmethod
+    def __empty(s: str) -> None:
+        if not s.strip(whitespace):
+            msg = "[Error]: Invalid Argument, got: ''"
+            raise ValueError(msg)
+        if not Path(s).stat().st_size:
+            msg = f"[Error]: Expected non-empty file, got: {s}"
+            raise OSError(msg)
 
     @classmethod
     def validate(cls, args: list[str]) -> None:
-        def check(args: list[str]) -> None:
-            size = len(args)
-            try:
-                if size < 2:
-                    msg = f"Fly-In requires at least 2 arguments: got {size}"
-                    raise ValueError(msg)
-            except ValueError as valErr:
-                raise ParserError(str(valErr)) from valErr
+        min_arg = 2
+        if len(args) < min_arg:
+            msg = f"Usage: {args[0]} <args>"
+            raise ParserError(msg)
 
-        check(args)
-        for path in args[1: ]:
-            try:
-                if not path.strip(whitespace) or not stat(path).st_size:
-                    raise ValueError(f"Invalid Argument, got: {path}")
-
+        try:
+            for path in args[1:]:
+                cls.__empty(path)
                 cls.__lexer(path)
-            except (FileNotFoundError, OSError, ValueError) as perr:
-                raise ParserError(str(perr)) from perr
+        except (OSError, ValueError) as perr:
+            raise ParserError(str(perr)) from perr
 
     @classmethod
     def __lexer(cls, path: str) -> None:
         d: dict[int, list[str]] = {}
-        with open(path) as file:
+        with Path(path).open(mode="r", encoding="utf-8") as file:
             d[-1] = [file.name]
             for index, line in enumerate(file.readlines()):
                 if line[0] in WhiteSpaces:
                     continue
-                d[index] = line.split(' ')
-            d[index+1] = [Tokens['terminator']]
+                d[index] = line.split(" ")
+            d[index + 1] = [Tokens["terminator"]]
 
         contents = {
-            k:v for k,v in d.items()
-            if k != -1 and v != [Tokens['terminator']]
+            k: v for k, v in d.items()
+            if k != -1 and v != [Tokens["terminator"]]
         }
 
         if not contents:
             msg = f"Empty file {d[-1][0]}"
             raise ValueError(msg)
-        
+
         for k, v in contents.items():
             if v[0] not in MapSymbols:
                 msg = f"Invalid Token found in line {k}, got: {v[0]}"
@@ -95,6 +81,26 @@ class Parser:
         cls.__files.append(d)
 
     @classmethod
-    def __syntaxer(cls) -> None: ...
+    def __syntax(cls) -> None:
+        pass
+
     @classmethod
-    def __parser(cls) -> None: ...
+    def __semantics(cls) -> None:
+        pass
+
+    @classmethod
+    def files(cls) -> Generator[dict[int, list[str]]]:
+        yield from cls.__files
+
+    @classmethod
+    def maps(cls) -> Generator[Config]:
+        yield from cls.__maps
+
+    @classmethod
+    def log(cls) -> None:
+        for file in cls.files():
+            print(f"\n=== {file[-1][0]}")
+            for k, v in file.items():
+                if k != -1 and v[0] != Tokens["terminator"]:
+                    print(f"{k}: {v}")
+        print("=" * 50)
