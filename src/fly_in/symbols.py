@@ -1,10 +1,9 @@
-Name = str
-Value = str | int
 Point = tuple[int, int]
-Drones = int
-Metadata = tuple[dict[Name, Value]] | dict[Name, Value] | None
-Hub = tuple[Name, Point, Metadata]
-Connection = tuple[dict[Name, Name], Metadata]
+Metadata = dict[str, str]
+Hub = tuple[str, Point, Metadata]
+Connection = tuple[dict[str, str], Metadata]
+
+MIN = 2
 
 Tokens: dict[str, str] = {
         "comment": "#",
@@ -41,3 +40,5 @@ RULES: dict[str, tuple[int, int | None]] = {
     Tokens["hub"]: (1, None),
     Tokens["connection"]: (2, None),
 }
+
+HUBS: set[str] = {Tokens["start"], Tokens["hub"], Tokens["end"]}
