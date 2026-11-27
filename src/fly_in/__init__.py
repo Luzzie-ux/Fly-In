@@ -1,3 +1,3 @@
-from .parser import Parser, ParserError
+from .parser import Analyser, AnalysisError
 
-__all__ = ["Parser", "ParserError"]
+__all__ = ["Analyser", "AnalysisError"]

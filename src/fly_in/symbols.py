@@ -33,3 +33,11 @@ MapSymbols: tuple[str, ...] = (
         Tokens["end"],
         Tokens["connection"]
     )
+
+RULES: dict[str, tuple[int, int | None]] = {
+    Tokens["drones"]: (1, 1),
+    Tokens["start"]: (1, 1),
+    Tokens["end"]: (1, 1),
+    Tokens["hub"]: (1, None),
+    Tokens["connection"]: (2, None),
+}

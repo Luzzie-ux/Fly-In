@@ -1,0 +1,10 @@
+# Demo Level 0: Linear Path
+
+nb_drones: 1
+
+start_hub: start 0 0 [color=green]
+hub: hub 1 0 [color=blue]
+end_hub: end 2 0 [color=red]
+
+connection: start-hub
+connection: hub-end

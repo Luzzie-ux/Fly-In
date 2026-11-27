@@ -1,11 +1,12 @@
 # Parser and Config class
+from collections import Counter
 from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from string import whitespace
 from typing import ClassVar
 
-from .symbols import Connection, Hub, MapSymbols, Tokens, WhiteSpaces
+from .symbols import RULES, Connection, Hub, MapSymbols, Tokens, WhiteSpaces
 
 
 @dataclass
@@ -18,17 +19,26 @@ class Config:
     end_hub: Hub
 
 
-class ParserError(Exception):
+class AnalysisError(Exception):
     def __init__(self, msg: str | None) -> None:
         if not msg:
-            msg = "ParserError: Unknown Error"
+            msg = "AnalysisError: Unknown Error"
         super().__init__(msg)
 
 
-class Parser:
+class Analyser:
     # properties:
     __files: ClassVar[list[dict[int, list[str]]]] = []
     __maps: ClassVar[list[Config]] = []
+
+    @staticmethod
+    def __default(args: list[str] | None) -> list[str]:
+        mins = 2
+        if not args or len(args) < mins:
+            print("[Warn]: No arguments given, defaulting for a demo file")
+            folder = Path(__file__).parent
+            return [str(file) for file in folder.glob("demo.txt")]
+        return args[1:]
 
     @staticmethod
     def __empty(s: str) -> None:
@@ -40,21 +50,47 @@ class Parser:
             raise OSError(msg)
 
     @classmethod
-    def validate(cls, args: list[str]) -> None:
-        min_arg = 2
-        if len(args) < min_arg:
-            msg = f"Usage: {args[0]} <args>"
-            raise ParserError(msg)
+    def validate(cls, argv: list[str] | None) -> None:
+        args: list[str] = cls.__default(argv)
 
         try:
-            for path in args[1:]:
+            for path in args:
                 cls.__empty(path)
-                cls.__lexer(path)
+                cls.__files.append(cls.__lexer(path))
         except (OSError, ValueError) as perr:
-            raise ParserError(str(perr)) from perr
+            raise AnalysisError(str(perr)) from perr
 
-    @classmethod
-    def __lexer(cls, path: str) -> None:
+        cls.__parser()
+
+    @staticmethod
+    def __lexer(path: str) -> dict[int, list[str]]:
+        def check_dict(d: dict[int, list[str]]) -> None:
+            contents = {
+                k: v for k, v in d.items()
+                if k != -1 and v != [Tokens["terminator"]]
+            }
+            if not contents:
+                msg = f"Empty file {d[-1][0]}"
+                raise ValueError(msg)
+            for k, v in contents.items():
+                if v[0] not in MapSymbols:
+                    msg = f"Invalid Token found in line {k}, got: {v[0]}"
+                    raise ValueError(msg)
+            return check_counts(d)
+
+        def check_counts(contents: dict[int, list[str]]) -> None:
+            counts = Counter(v[0] for v in contents.values() if v)
+            for tok, (lo, hi) in RULES.items():
+                n = counts[tok]
+                if n < lo or (hi is not None and n > hi):
+                    expected = (
+                        f"exactly {lo}" if lo == hi
+                        else f"at least {lo}" if hi is None
+                        else f"between {lo} and {hi}"
+                    )
+                    msg = f"Expected {expected} '{tok}' token(s), got {n}"
+                    raise ValueError(msg)
+
         d: dict[int, list[str]] = {}
         with Path(path).open(mode="r", encoding="utf-8") as file:
             d[-1] = [file.name]
@@ -63,26 +99,19 @@ class Parser:
                     continue
                 d[index] = line.split(" ")
             d[index + 1] = [Tokens["terminator"]]
+        check_dict(d)
 
-        contents = {
-            k: v for k, v in d.items()
-            if k != -1 and v != [Tokens["terminator"]]
-        }
-
-        if not contents:
-            msg = f"Empty file {d[-1][0]}"
-            raise ValueError(msg)
-
-        for k, v in contents.items():
-            if v[0] not in MapSymbols:
-                msg = f"Invalid Token found in line {k}, got: {v[0]}"
-                raise ValueError(msg)
-
-        cls.__files.append(d)
+        return d
 
     @classmethod
-    def __syntax(cls) -> None:
-        pass
+    def __parser(cls) -> None:
+        for file in cls.files():
+            name = file[-1][0]
+            print(f"Inspecting {name}")
+            for k, v in file.items():
+                if k == -1:
+                    continue
+                print(k, v)
 
     @classmethod
     def __semantics(cls) -> None:
